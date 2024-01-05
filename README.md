@@ -9,5 +9,5 @@
 ## Quelques fonctionnalités supplémentaires que nous avons implémenté :
   - Des récompenses pour les mineurs avec système de halving
   - Une initialisation de la simulation avec une blockchain vide
-  - Les mineurs peuvent être en concurrence et miner en même temps grâce au threading
+  - Les mineurs peuvent être en concurrence et miner en même temps grâce au threading\n
  Ce projet est réalisé par Damien Bonzom et Martin Sueur
