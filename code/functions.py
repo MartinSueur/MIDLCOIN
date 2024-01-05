@@ -1,6 +1,8 @@
 from class32Point import *
 from hashlib import sha256
 from math import sqrt
+from constantes import DIFFICULTEMINAGE
+import time
 
 def find_trans_by_id(transactions,id):
     for trans in transactions:
@@ -8,23 +10,12 @@ def find_trans_by_id(transactions,id):
             return trans
     return -1
 
-def format32(hash):
-    return f'{hash:32d}'
-
-def condition_hash_valide(strHash,n=7):
+def condition_hash_valide(strHash,n=DIFFICULTEMINAGE):
     res = True
     for i in range(n):
         if strHash[32-i-1] != str(i+1):
            res = False
     return res
-
-def miner(block):
-    strHash = format32(block.get_hash())
-    while not condition_hash_valide(strHash):
-        block.proof += 1
-        strHash = format32(block.get_hash())
-        #print(f"{block.proof} : {strHash}")
-    return block.proof
 
 def hash32(s):
     '''two rounds of sha32'''
@@ -49,3 +40,37 @@ def intInput(chaine):
     if i.isdigit():
         return int(i)
     return -1
+
+def str_temps(secondes):
+   chaine = ""
+   minutes = 0
+   heures = 0
+   while secondes > 60 :
+      minutes += 1
+      secondes -= 60
+   while minutes > 60 :
+      heures += 1
+      minutes -= 60
+   if heures != 0 :
+      chaine += f"{heures} heures "
+   if minutes != 0 :
+      chaine += f"{minutes} minutes "
+   if secondes != 0 :
+      chaine += f"{round(secondes,3)} secondes "
+   return chaine
+
+def diffuserVirement(transactions,virement): # un virement est un couple transaction,signature
+   trans = virement[0]
+   sign = virement[1]
+   #if trans.emetteur.clePublique.verify(trans.getMessage(),sign):
+   transactions.append(trans)
+
+def voir_user(user):
+   print(f"Utilisateur n°{user.id} : {user.pseudo}")
+
+def voir_registre_users(users):
+   for user in users:
+      voir_user(user)
+
+def format32(hash):
+    return f'{hash:32d}'

@@ -11,3 +11,5 @@ Gy = 86
 N = 7
 P = 223
 """
+
+DIFFICULTEMINAGE = 7

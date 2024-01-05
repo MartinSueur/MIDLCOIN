@@ -1,12 +1,14 @@
 from classBlock import *
-from functions import format32
+from functions import format32,intInput
 from classBlockChain import *
+from heuristiques import *
 import os
 
 class Miner(User):
-    def __init__(self,pseudo,identifiant):
+    def __init__(self,pseudo,identifiant,heuristique=h_increment):
         super().__init__(pseudo,identifiant)
         self.liste_blocks = []
+        self.heuristique = heuristique
 
     def voir_transactions(self,transactions):
         for trans in transactions:
@@ -22,7 +24,7 @@ class Miner(User):
     
     def ajouter_transaction(self,block,transactions,id):
         trans = find_trans_by_id(transactions,id)
-        if block.add_trans(trans):
+        if trans!= -1 and block.add_trans(trans):
             transactions.remove(trans)
             return True
         else:
@@ -39,7 +41,7 @@ class Miner(User):
             print("Choisissez les transactions pour votre bloc puis -1 pour s'arreter.")
             print("Liste des transactions :")
             self.voir_transactions(transactions)
-            id = int(input("Quelle transaction ajouter ? (id) : "))
+            id = intInput("Quelle transaction ajouter ? (id) : ")
             if id != -1 and self.ajouter_transaction(block,transactions,id):
                 print("La transaction à été ajoutée.")
             else:
@@ -48,6 +50,17 @@ class Miner(User):
             input("Appuyer sur Entrée pour continuer")
         self.liste_blocks.append(block)
         print("Le block a bien été enregistré.")
+
+    def miner(self,indice):
+        if indice >= 0 and indice < len(self.liste_blocks):
+            block = self.liste_blocks[indice]
+            strHash = format32(block.get_hash())
+            while not condition_hash_valide(strHash):
+                block.proof = self.heuristique(block.proof)
+                strHash = format32(block.get_hash())
+            return block.proof
+        else:
+            return -1
     
     def valider_block(self,proof,utilisateurs,blockchain): #pour le moment on peut valider que le premier bloc
         if len(self.liste_blocks) <= 0:

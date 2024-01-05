@@ -8,57 +8,19 @@ from classPrivateKey import *
 from classSignature import *
 from classUser import *
 from classMiner import *
-from functions import miner
 from threading import *
 from classThreadMiner import *
 from classVerif import *
 from heuristiques import *
+from functions import voir_registre_users,diffuserVirement,str_temps
 import time
 
-def str_temps(secondes):
-   chaine = ""
-   minutes = 0
-   heures = 0
-   while secondes > 60 :
-      minutes += 1
-      secondes -= 60
-   while minutes > 60 :
-      heures += 1
-      minutes -= 60
-   if heures != 0 :
-      chaine += f"{heures} heures "
-   if minutes != 0 :
-      chaine += f"{minutes} minutes "
-   if secondes != 0 :
-      chaine += f"{round(secondes,3)} secondes "
-   return chaine
 
-def diffuserVirement(virement):
-   trans = virement[0]
-   sign = virement[1]
-   #if trans.emetteur.clePublique.verify(trans.getMessage(),sign):
-   transactions.append(trans)
-
-def voir_user(user):
-   print(f"Utilisateur n°{user.id} : {user.pseudo}")
-
-def voir_registre_users(users):
-   for user in users:
-      voir_user(user)
-
-def get_total_tip(block):
-   total = 0
-   get_total_tip= 0
-   for trans in block.transactions:
-      total+=trans.tip
-   return total
-
-
-def lancer_minage_collectif(utilisateurs):
+def lancer_minage_collectif(utilisateurs,blockchain):
    liste_threads = []
    for i in range(len(utilisateurs)):
       if len(utilisateurs[i].liste_blocks) > 0 :
-            liste_threads.append(ThreadMiner(utilisateurs[i],h_random))
+            liste_threads.append(ThreadMiner(utilisateurs[i]),h_random)
 
    verif = ThreadVerif(liste_threads)
 
@@ -77,12 +39,13 @@ def lancer_minage_collectif(utilisateurs):
    tempstotal = time.time() - debut
    if len(liste_threads) > 0 :
       print(f"Le mineur le plus rapide est : {verif.thread_gagnant.mineur.pseudo}")
-      verif.thread_gagnant.mineur.valider_block(verif.thread_gagnant.resultat, utilisateurs, BLOCKCHAIN)
+      verif.thread_gagnant.mineur.valider_block(verif.thread_gagnant.resultat, utilisateurs, blockchain)
       print(f"Le bloc a été validé en {str_temps(tempstotal)} !")
       input("Appuyez pour continuer...")
    else :
       print("Aucun mineur n'a de bloc à miner.")
       input("Appuyez pour continuer...")
+
 
 def session_utilisateur(active_user):
    j=0
@@ -103,7 +66,7 @@ def session_utilisateur(active_user):
             if montant >= 0:
                tip = intInput("Combien donnez-vous en pourboire ?\n")
                if tip >= 0:
-                  diffuserVirement(active_user.virement(destinataire,montant,tip,IDTRANSACTION.nextId()))
+                  diffuserVirement(transactions,active_user.virement(destinataire,montant,tip,IDTRANSACTION.nextId()))
                   input("Transaction réussie\nAppuyez sur Entrée pour continuer")
                else:
                   input("Pourboire non valide\nAppuyez sur Entrée pour continuer")
@@ -116,10 +79,10 @@ def session_utilisateur(active_user):
          num_bloc = intInput("Quel bloc veux-tu miner ?\n")
          if num_bloc >= 0 and num_bloc < len(active_user.liste_blocks):
             debut = time.time()
-            active_user.valider_block(miner(active_user.liste_blocks[num_bloc]),utilisateurs,BLOCKCHAIN)
+            active_user.valider_block(active_user.miner(num_bloc),utilisateurs,BLOCKCHAIN)
             tempstotal = time.time() - debut
             print(f"Le bloc a été validé en {str_temps(tempstotal)} !")
-            print(f"Vous avez gagné {get_total_tip(BLOCKCHAIN.lastBlock())+BLOCKCHAIN.halving}ϻ")
+            print(f"Vous avez gagné {BLOCKCHAIN.lastBlock().get_total_tip()+BLOCKCHAIN.halving}ϻ")
          else:
             print("Mauvais numéro de bloc")
          input("Appuyez sur Entrée pour continuer")
@@ -168,9 +131,9 @@ while i!=4:
       input("Appuyez sur Entrée pour continuer")
       session_utilisateur(active_user)
    elif i==3:
-      lancer_minage_collectif(utilisateurs)
+      lancer_minage_collectif(utilisateurs,BLOCKCHAIN)
    elif i==4:
-      input("Vous allez quitter la session... Aurevoir\nAppuyez sur Entrée pour quitter")
+      input("Vous allez quitter la session...\nAppuyez sur Entrée pour quitter")
    else:
       input("Veuillez faire un choix valide\nAppuyez sur Entrée pour continuer")
 
@@ -185,13 +148,13 @@ Bob = Miner("Bob",IDUTILISATEURS.nextId())
 utilisateurs.append(Julie)
 utilisateurs.append(Bob)
 virement1 = Julie.virement(Bob,40,2,IDTRANSACTION.nextId())
-diffuserVirement(virement1)
+diffuserVirement(transactions,virement1)
 
 fraude = Transaction(Julie,Bob,40,2,IDTRANSACTION.nextId())
 virement2 = (fraude,Bob.clePrivee.sign(fraude.getMessage()))
 
 virement2 = Bob.virement(Julie,20,5,IDTRANSACTION.nextId())
-diffuserVirement(virement2)
+diffuserVirement(transactions,virement2)
 Bob.construire_block(transactions,BLOCKCHAIN)
 proof = miner(Bob.liste_blocks[0])
 Bob.valider_block(proof,utilisateurs,BLOCKCHAIN)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from functions import hash32
+from functions import *
 
 class Transaction:
     def __init__(self,emetteur,receveur,montant,tip,identifiant):

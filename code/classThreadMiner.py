@@ -1,9 +1,10 @@
 from threading import *
 from classMiner import *
-from functions import *
+from functions import format32,condition_hash_valide
+from heuristiques import *
 
 class ThreadMiner(Thread):
-    def __init__(self, mineur,heuristique=lambda x : x + 1):
+    def __init__(self, mineur,heuristique=h_increment):
         Thread.__init__(self)
         self.termine = False
         self.mineur = mineur

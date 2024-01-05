@@ -70,3 +70,9 @@ class Block:
             chaine+=str(trans.getMessage())
         chaine+=str(self.proof)
         return int.from_bytes(hash32(chaine.encode()),'big')
+    
+    def get_total_tip(self):
+        total = 0
+        for trans in self.transactions:
+            total+=trans.tip
+        return total

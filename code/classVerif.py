@@ -1,6 +1,5 @@
 from threading import *
 from classMiner import *
-from functions import *
 
 class ThreadVerif(Thread):
     def __init__(self, liste_threads):
