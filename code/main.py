@@ -10,7 +10,28 @@ from classUser import *
 from classMiner import *
 from functions import miner
 from threading import *
-from classMinageCollectif import *
+from classThreadMiner import *
+from classVerif import *
+from heuristiques import *
+import time
+
+def str_temps(secondes):
+   chaine = ""
+   minutes = 0
+   heures = 0
+   while secondes > 60 :
+      minutes += 1
+      secondes -= 60
+   while minutes > 60 :
+      heures += 1
+      minutes -= 60
+   if heures != 0 :
+      chaine += f"{heures} heures "
+   if minutes != 0 :
+      chaine += f"{minutes} minutes "
+   if secondes != 0 :
+      chaine += f"{round(secondes,3)} secondes "
+   return chaine
 
 def diffuserVirement(virement):
    trans = virement[0]
@@ -26,49 +47,42 @@ def voir_registre_users(users):
       voir_user(user)
 
 def get_total_tip(block):
-   total= 0
+   total = 0
+   get_total_tip= 0
    for trans in block.transactions:
       total+=trans.tip
    return total
 
-def thread_verification(liste_threads):
-   termine = False
-   while not termine :
-      for threads in liste_threads :
-         print(threads.mineur.liste_blocks[0].proof, threads)
-         if threads.resultat > 0 :
-            termine = True
-
-   for threads in liste_threads :
-      threads.termine = True
-
 
 def lancer_minage_collectif(utilisateurs):
-   liste_mineurs_actifs = []
    liste_threads = []
-   for mineur in utilisateurs :
-      if len(mineur.liste_blocks) > 0 :
-         liste_mineurs_actifs.append(mineur)
-         liste_threads.append(ThreadMiner(mineur))
+   for i in range(len(utilisateurs)):
+      if len(utilisateurs[i].liste_blocks) > 0 :
+            liste_threads.append(ThreadMiner(utilisateurs[i],h_random))
 
-   verif = Thread(target=thread_verification, args=[liste_threads])
+   verif = ThreadVerif(liste_threads)
 
    verif.start()
+
+   debut = time.time()
 
    for threads in liste_threads :
       threads.start()
 
-   verif.join()   
+   verif.join()
       
    for threads in liste_threads :
       threads.join()
 
-   for threads in liste_threads :
-      if threads.resultat != -1 :
-         print(f"Le mineur le plus rapide est : {threads.mineur.pseudo}")
-         threads.mineur.valider_block(threads.resultat, utilisateurs, BLOCKCHAIN) 
-         print("Le bloc a été validé")
-         input("Appuyez pour continuer...")
+   tempstotal = time.time() - debut
+   if len(liste_threads) > 0 :
+      print(f"Le mineur le plus rapide est : {verif.thread_gagnant.mineur.pseudo}")
+      verif.thread_gagnant.mineur.valider_block(verif.thread_gagnant.resultat, utilisateurs, BLOCKCHAIN)
+      print(f"Le bloc a été validé en {str_temps(tempstotal)} !")
+      input("Appuyez pour continuer...")
+   else :
+      print("Aucun mineur n'a de bloc à miner.")
+      input("Appuyez pour continuer...")
 
 def session_utilisateur(active_user):
    j=0
@@ -101,8 +115,10 @@ def session_utilisateur(active_user):
          active_user.voir_blocks()
          num_bloc = intInput("Quel bloc veux-tu miner ?\n")
          if num_bloc >= 0 and num_bloc < len(active_user.liste_blocks):
+            debut = time.time()
             active_user.valider_block(miner(active_user.liste_blocks[num_bloc]),utilisateurs,BLOCKCHAIN)
-            print("Le bloc a été validé !")
+            tempstotal = time.time() - debut
+            print(f"Le bloc a été validé en {str_temps(tempstotal)} !")
             print(f"Vous avez gagné {get_total_tip(BLOCKCHAIN.lastBlock())+BLOCKCHAIN.halving}ϻ")
          else:
             print("Mauvais numéro de bloc")
@@ -115,8 +131,8 @@ def session_utilisateur(active_user):
       else:
          input("Veuillez faire un choix valide\nAppuyez sur Entrée pour continuer")
 
-G = S32Point(Gx,Gy)
 """
+G = S32Point(Gx,Gy)
 e = 12
 private = PrivateKey(e)
 public = e*G
