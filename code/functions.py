@@ -11,7 +11,7 @@ def find_trans_by_id(transactions,id):
 def format32(hash):
     return f'{hash:32d}'
 
-def condition_hash_valide(strHash,n=6):
+def condition_hash_valide(strHash,n=7):
     res = True
     for i in range(n):
         if strHash[32-i-1] != str(i+1):
