@@ -2,6 +2,7 @@ from constantes import *
 from classSignature import *
 from hashlib import sha256
 from class256Point import *
+import random
 import hmac
 
 G = S256Point(Gx,Gy)
@@ -18,7 +19,8 @@ class PrivateKey:
         return '{:x}'.format(self.secret).zfill(64)
     #permet de signer un message avec sa clé privée
     def sign(self, z):
-        k = self.deterministic_k(z)
+        #k = self.deterministic_k(z)
+        k = self.random_k()
         r = (k * G).x.num
         k_inv = pow(k, N - 2, N)
         s = (z + r * self.secret) * k_inv % N
@@ -45,3 +47,5 @@ class PrivateKey:
                 return candidate
             k = hmac.new(k, v + b'\x00', s256).digest()
             v = hmac.new(k, v, s256).digest()
+    def random_k(self):
+        return random.randint(1,N)

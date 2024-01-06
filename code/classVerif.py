@@ -9,7 +9,7 @@ class ThreadVerif(Thread):
         Thread.__init__(self)
         self.liste_threads = liste_threads
         self.thread_gagnant = None
-
+    #processus de vérification d'arrêt d'un thread de minage
     def run(self):
         termine = False
         lock = RLock()

@@ -1,10 +1,13 @@
 from classBlock import *
 
 class BlockChain:
+    """
+    Classe représentant la blockchain composée d'une liste de blocs
+    """
     def __init__(self):
         self.blockchain = []
         self.halving = 100
-    
+    #représentation de la blockchain
     def __str__(self):
         chaine = ""
         fleche = "                       ||\n"
@@ -15,8 +18,8 @@ class BlockChain:
                 chaine+=fleche*3
                 chaine+="                       \\/\n"
         return chaine
-
-    def ajouter_block(self,block,utilisateurs,miner): #TODO : effectuer les transactions du block ajouté
+    #ajoute un bloc a la blockchain en effectuant ses opérations
+    def ajouter_block(self,block,utilisateurs,miner):
         self.blockchain.append(block)
         for user in utilisateurs:
             user.liste_blocks = []
@@ -27,11 +30,11 @@ class BlockChain:
         miner.solde+=self.halving
         self.update_halving()
         
-        
+    #met à jour le montant du halving à chaque ajout de bloc
     def update_halving(self):
         if len(self.blockchain)%4==0:
             self.halving/=2
-
+    #retourne le dernier block de la blockchain
     def lastBlock(self):
         return self.blockchain[-1]
 
