@@ -2,6 +2,9 @@ from threading import *
 from classMiner import *
 
 class ThreadVerif(Thread):
+    """
+    Thread arrêtant tous les processus de minage quand un mineur valide un bloc
+    """
     def __init__(self, liste_threads):
         Thread.__init__(self)
         self.liste_threads = liste_threads

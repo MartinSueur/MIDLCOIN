@@ -14,4 +14,4 @@ class Transaction:
         return f"Transaction n°{self.id} : {self.emetteur.pseudo} paye {self.receveur.pseudo} {self.montant}ϻ. (Tip:{self.tip}ϻ)"
     
     def getMessage(self):
-        return int.from_bytes(hash32(f"{self.id}{self.emetteur.id}{self.receveur.id}{self.montant}{self.tip}".encode()),'big')
+        return int.from_bytes(hash256(f"{self.id}{self.emetteur.id}{self.receveur.id}{self.montant}{self.tip}".encode()),'big')

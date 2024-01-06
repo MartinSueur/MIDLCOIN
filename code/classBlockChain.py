@@ -13,7 +13,7 @@ class BlockChain:
             chaine+=str(self.blockchain[i])
             if i != len(self.blockchain)-1:
                 chaine+=fleche*3
-                chaine+="                       v\n"
+                chaine+="                       \\/\n"
         return chaine
 
     def ajouter_block(self,block,utilisateurs,miner): #TODO : effectuer les transactions du block ajouté

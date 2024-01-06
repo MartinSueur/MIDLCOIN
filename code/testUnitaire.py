@@ -1,38 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from classId import *
-from class32Field import *
-from class32Point import *
+from class256Field import *
+from class256Point import *
 from constantes import *
 from classPrivateKey import *
 from classSignature import *
 from classUser import *
 from classMiner import *
-from functions import miner
+from functions import *
 from threading import *
 from classThreadMiner import *
 from classVerif import *
 from heuristiques import *
 import random
-
-def diffuserVirement(virement):
-   trans = virement[0]
-   sign = virement[1]
-   #if trans.emetteur.clePublique.verify(trans.getMessage(),sign):
-   transactions.append(trans)
-
-def voir_user(user):
-   print(f"Utilisateur n°{user.id} : {user.pseudo}")
-
-def voir_registre_users(users):
-   for user in users:
-      voir_user(user)
-
-def get_total_tip(block):
-   total= 0
-   for trans in block.transactions:
-      total+=trans.tip
-   return total
 
 
 def lancer_minage_collectif(utilisateurs):
@@ -60,15 +41,7 @@ def lancer_minage_collectif(utilisateurs):
 
 
 
-"""
-G = S32Point(Gx,Gy)
-e = 12
-private = PrivateKey(e)
-public = e*G
-message = int.from_bytes(hash32(b'quoicoubeh'),'big')
-sign = private.sign(message)
-print(public.verify(message,sign))
-"""
+
 #initialisation
 IDTRANSACTION = Id()
 IDUTILISATEURS = Id()
@@ -76,7 +49,16 @@ BLOCKCHAIN = BlockChain()
 transactions = []
 utilisateurs = []
 
-for i in range(100):
-    utilisateurs.append(Miner(f"user{i}",IDUTILISATEURS.nextId()))
-    utilisateurs[i].liste_blocks.append(Block(0,utilisateurs[i]))
-lancer_minage_collectif(utilisateurs)
+
+Julie = Miner("Julie",IDUTILISATEURS.nextId())
+Bob = Miner("Bob",IDUTILISATEURS.nextId())
+utilisateurs.append(Julie)
+utilisateurs.append(Bob)
+virement1 = Julie.virement(Bob,40,2,IDTRANSACTION.nextId())
+diffuserVirement(transactions,virement1)
+
+fraude = Transaction(Julie,Bob,40,2,IDTRANSACTION.nextId())
+virement2 = (fraude,Bob.clePrivee.sign(fraude.getMessage()))
+
+diffuserVirement(transactions,virement2)
+Bob.construire_block(transactions,BLOCKCHAIN)
