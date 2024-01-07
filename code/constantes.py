@@ -9,4 +9,4 @@ N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
 #Nombre premier du corps fini
 P = 2**256 - 2**32 - 977
 #Difficulté de minage
-DIFFICULTEMINAGE = 8
+DIFFICULTEMINAGE = 6

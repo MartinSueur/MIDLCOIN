@@ -14,7 +14,7 @@ class Transaction:
         self.tip = tip
         self.id = identifiant
     #représente une transaction
-    def __repr__(self): #peut pas mettre de parenthèses... chokbar de l'erreur
+    def __repr__(self):
         return f"Transaction n°{self.id} : {self.emetteur.pseudo} paye {self.receveur.pseudo} {self.montant}ϻ. (Tip:{self.tip}ϻ)"
     #renvoie le hash d'une transaction contenant toutes ses informations
     def getMessage(self):

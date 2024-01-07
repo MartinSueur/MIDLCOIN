@@ -20,15 +20,16 @@ class BlockChain:
         return chaine
     #ajoute un bloc a la blockchain en effectuant ses opérations
     def ajouter_block(self,block,utilisateurs,miner):
-        self.blockchain.append(block)
-        for user in utilisateurs:
-            user.liste_blocks = []
-        for trans in block.transactions:
-            trans.receveur.solde+=trans.montant
-            trans.emetteur.solde-=trans.montant+trans.tip
-            miner.solde+=trans.tip
-        miner.solde+=self.halving
-        self.update_halving()
+        if (len(self.blockchain) == 0 and block.prev_hash == 0) or (not len(self.blockchain) == 0 and block.prev_hash == self.lastBlock().get_hash()):
+            self.blockchain.append(block)
+            for user in utilisateurs:
+                user.liste_blocks = []
+            for trans in block.transactions:
+                trans.receveur.solde+=trans.montant
+                trans.emetteur.solde-=trans.montant+trans.tip
+                miner.solde+=trans.tip
+            miner.solde+=self.halving
+            self.update_halving()
         
     #met à jour le montant du halving à chaque ajout de bloc
     def update_halving(self):
